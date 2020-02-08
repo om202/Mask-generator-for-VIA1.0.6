@@ -2,11 +2,9 @@ import pandas as pd
 import numpy as np
 from PIL import Image, ImageDraw, ImageChops
 
-
-
-#print(data)
-
-
+'''
+VGG Image Annotator (VIA) http://www.robots.ox.ac.uk/~vgg/software/via/
+'''
 
 def importCSV(path):
 
@@ -28,10 +26,8 @@ def importCSV(path):
         x.append(data2.values[row,0].split("all_points")[1])
         y.append(data2.values[row,0].split("all_points")[2])
 
-
     xList=[]
     yList=[]
-
 
     ##Making a list of x coordinates for each images
     for element in range(len(x)):
@@ -40,13 +36,9 @@ def importCSV(path):
         x[element] = x[element].replace('[', "")
         x[element] = x[element].replace(']', "")
 
-
-
     ##Splitting them
     for element in x:
         xList.append(element.split(",",))
-
-
 
     ##Converting them to integers
     for element in xList:
@@ -79,6 +71,7 @@ def makePolygon(xList, yList):
         polygon.append(tuple)
     return polygon
 
+
 def getMask(x_list, y_list, original):
     #Returns the mask of the polygon
     polygon = makePolygon(x_list, y_list)
@@ -87,6 +80,7 @@ def getMask(x_list, y_list, original):
     mask_draw = ImageDraw.Draw(mask)
     mask_draw.polygon(polygon, fill=(0,0,0))
     return mask
+
 
 def cropPictures(images, pathOriginal, pathSave):
     #Returns the image contained in the region
@@ -98,9 +92,13 @@ def cropPictures(images, pathOriginal, pathSave):
         diff = ImageChops.lighter(original, mask)
         diff.save(pathSave+"/"+images[0][0][picture], "JPEG")
 
+
 if __name__ == '__main__':
-    names_, xlist_, ylist_ = importCSV("image_csv.csv")
+    
+    csv_data_path = "image_csv.csv" # csv generated from Oxford VIA 1.0.6
+    originalpath = 'images'         # Path of images from which mask are to be generated
+    pathsave = 'output'             # Path to save your mask
+    
+    names_, xlist_, ylist_ = importCSV(csv_data_path) 
     images = [names_, xlist_, ylist_]
-    originalpath = 'images'
-    pathsave = 'output'
     cropPictures(images, originalpath, pathsave)
